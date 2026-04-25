@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSocket } from "../SocketContext";
+import { SettingsButton } from "../MusicPlayer";
 import styles from "./GameScreen.module.css";
 
 // Compress + resize an image file to a base64 string safe for socket transport.
-// Max dimension 800px, JPEG quality 0.7 — keeps it well under 200 KB in practice.
 function compressImage(file) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -34,13 +34,28 @@ const REVEAL_PLACEHOLDERS = {
   assassin: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23111111'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='56' font-family='sans-serif'%3E%F0%9F%92%80%3C/text%3E%3C/svg%3E",
 };
 
-export default function GameScreen({ code, playerId, initialGame, initialRoom }) {
+// Overlay colors for the game-over reveal (shown on top of original image)
+const ROLE_OVERLAY_STYLE = {
+  red:      { border: "4px solid #e63946", boxShadow: "0 0 0 2px #e63946, inset 0 0 0 2px #e63946" },
+  blue:     { border: "4px solid #457b9d", boxShadow: "0 0 0 2px #457b9d, inset 0 0 0 2px #457b9d" },
+  neutral:  { border: "4px solid #c8b8a0", boxShadow: "0 0 0 2px #c8b8a0" },
+  assassin: { border: "4px solid #111",    boxShadow: "0 0 0 2px #111" },
+};
+
+const ROLE_BADGE = {
+  red:      { bg: "#e63946", label: "🔴 RED" },
+  blue:     { bg: "#457b9d", label: "🔵 BLUE" },
+  neutral:  { bg: "#c8b8a0", label: "⬜ NEUTRAL", color: "#333" },
+  assassin: { bg: "#111",    label: "💀 ASSASSIN" },
+};
+
+export default function GameScreen({ code, playerId, initialGame, initialRoom, music }) {
   const { socket } = useSocket();
   const [game, setGame] = useState(initialGame || null);
   const [room, setRoom] = useState(initialRoom || null);
   const [selectedNum, setSelectedNum] = useState(1);
   const [customUrl, setCustomUrl] = useState("");
-  const [customMode, setCustomMode] = useState(false); // false=URL, true=upload
+  const [customMode, setCustomMode] = useState(false);
   const [uploadPreview, setUploadPreview] = useState(null);
   const [uploadError, setUploadError] = useState(null);
   const fileInputRef = useRef(null);
@@ -62,7 +77,7 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
     return () => clearTimeout(t);
   }, [socket, game]);
 
-  // ── Paste handler (Ctrl+V image from clipboard) ───────────────────────────
+  // Paste handler (Ctrl+V image from clipboard)
   const handlePaste = useCallback(async (e) => {
     const items = e.clipboardData?.items;
     if (!items) return;
@@ -81,7 +96,6 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
         return;
       }
     }
-    // If it's text (a URL), put it in the URL field
     const text = e.clipboardData?.getData("text");
     if (text && (text.startsWith("http://") || text.startsWith("https://"))) {
       setCustomUrl(text);
@@ -90,7 +104,6 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
     }
   }, []);
 
-  // Listen for paste anywhere on the page when it's spymaster turn
   useEffect(() => {
     document.addEventListener("paste", handlePaste);
     return () => document.removeEventListener("paste", handlePaste);
@@ -108,6 +121,9 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
   const isOperativeTurn = me?.role === "operative" && isMyTurn && game.phase === "operatives_guess";
   const gameOver = game.phase === "game_over";
 
+  // At game over, operatives (and everyone) can see all card roles
+  const canSeeAllRoles = isSpymaster || gameOver;
+
   // Clue helpers
   const getClueUrl = () => uploadPreview || (customUrl.trim() ? customUrl.trim() : null);
   const previewUrl = getClueUrl();
@@ -120,7 +136,6 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
     try {
       socket.emit("submit_clue", { imageUrl: url, number: selectedNum });
     } catch (err) {
-      // Socket error — discard and let the spymaster try again
       setUploadError("Failed to send clue. Please try again.");
       return;
     }
@@ -156,7 +171,7 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
   const returnToLobby = () => socket.emit("request_lobby");
   const endForAll = () => socket.emit("end_game_for_all");
 
-  // ── Left panel content ─────────────────────────────────────────────────────
+  // Left panel
   const renderLeftPanel = () => {
     if (gameOver) {
       return (
@@ -165,6 +180,28 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
             <div className={styles.goEmoji}>{game.winner === "red" ? "🔴" : "🔵"}</div>
             <div className={`${styles.goTitle} ${styles[`win_${game.winner}`]}`}>{game.winner?.toUpperCase()} WINS!</div>
             <div className={styles.goReason}>{game.winReason}</div>
+            {/* Reveal legend for operatives */}
+            {!isSpymaster && (
+              <div style={{
+                background: "rgba(255,255,255,0.08)",
+                borderRadius: "8px",
+                padding: "0.6rem 0.8rem",
+                marginTop: "0.7rem",
+                marginBottom: "0.4rem",
+                fontSize: "0.78rem",
+                lineHeight: 1.6,
+                textAlign: "left",
+              }}>
+                <div style={{ fontWeight: 700, marginBottom: "0.3rem", opacity: 0.85 }}>🗺 Board Revealed</div>
+                {Object.entries(ROLE_BADGE).map(([role, { bg, label, color }]) => (
+                  <div key={role} style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.2rem" }}>
+                    <span style={{ background: bg, color: color || "white", borderRadius: "4px", padding: "0 0.35rem", fontSize: "0.72rem", fontWeight: 700 }}>{label}</span>
+                    <span style={{ opacity: 0.7 }}>= {role} card</span>
+                  </div>
+                ))}
+                <div style={{ marginTop: "0.4rem", opacity: 0.6 }}>Coloured borders show each card's team.</div>
+              </div>
+            )}
             <button className={styles.returnBtn} onClick={returnToLobby}>Return to Lobby</button>
             {room?.host === playerId && (
               <button className={styles.endAllBtn} onClick={endForAll}>End for Everyone</button>
@@ -181,7 +218,6 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
           <div className={styles.panelLabel}>🕵️ Submit Your Clue</div>
           <div className={styles.pasteHint}>💡 Ctrl+V to paste an image directly from Google</div>
 
-          {/* Big preview */}
           <div className={styles.bigPreviewBox}>
             {previewUrl
               ? <img src={previewUrl} alt="clue preview" className={styles.bigPreviewImg} />
@@ -307,11 +343,15 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
             {gameOver ? "· Game Over" : game.phase === "spymaster_clue" ? "· Spymaster thinking…" : `· Guessing (${game.guessesLeft} left)`}
           </span>
         </div>
-        {me && (
-          <div className={`${styles.myRole} ${isSpymaster ? styles.spyRole : isSpectator ? styles.specRole : styles.opRole} ${styles[`role_${myTeam || "none"}`]}`}>
-            {isSpymaster ? "🕵️ Spymaster" : isSpectator ? "👁 Spectator" : "🔍 Operative"}{myTeam ? ` · ${myTeam}` : ""}
-          </div>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          {me && (
+            <div className={`${styles.myRole} ${isSpymaster ? styles.spyRole : isSpectator ? styles.specRole : styles.opRole} ${styles[`role_${myTeam || "none"}`]}`}>
+              {isSpymaster ? "🕵️ Spymaster" : isSpectator ? "👁 Spectator" : "🔍 Operative"}{myTeam ? ` · ${myTeam}` : ""}
+            </div>
+          )}
+          {/* Settings button in topbar */}
+          <SettingsButton music={music} />
+        </div>
       </div>
 
       {/* Banner */}
@@ -326,6 +366,22 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
         </div>
       )}
 
+      {/* Game-over reveal banner for operatives */}
+      {gameOver && !isSpymaster && (
+        <div style={{
+          background: "linear-gradient(90deg, #1a1a2e, #16213e)",
+          borderBottom: "2px solid rgba(255,255,255,0.15)",
+          color: "rgba(255,255,255,0.9)",
+          textAlign: "center",
+          padding: "0.5rem 1rem",
+          fontSize: "0.85rem",
+          fontWeight: 600,
+          letterSpacing: "0.03em",
+        }}>
+          🗺 Game over — all cards are now revealed! Coloured borders show each card's true team.
+        </div>
+      )}
+
       <div className={styles.body}>
         {renderLeftPanel()}
 
@@ -337,23 +393,42 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom })
                 const revealed = card.revealed;
                 const canGuess = isOperativeTurn && !revealed && !gameOver;
 
-                // Spymaster always sees coloured borders on all cards
-                // Operatives: at game over, unrevealed cards get the border so they can see what was what
-                const spyBorderClass = (isSpymaster || (!revealed && gameOver))
-                  ? styles[`spyBorder_${card.role}`]
-                  : "";
-                const revealedClass = revealed ? styles[`revealed_${card.role}`] : "";
+                // Spymasters always see borders; at game over everyone sees borders
+                const spyBorderClass = canSeeAllRoles ? styles[`spyBorder_${card.role}`] : "";
+                const revealedClass  = revealed ? styles[`revealed_${card.role}`] : "";
 
                 return (
                   <div key={i}
                     className={[styles.card, revealedClass, spyBorderClass,
                       canGuess ? styles.canGuess : styles.noGuess].filter(Boolean).join(" ")}
                     onClick={() => canGuess && guessCard(i)}
+                    style={{ position: "relative" }}
                   >
                     {revealed
                       ? <img src={REVEAL_PLACEHOLDERS[card.role]} alt={card.role} className={styles.cardImg} />
                       : <img src={card.url} alt={card.label} className={styles.cardImg} loading="lazy" />
                     }
+
+                    {/* Game-over badge: show role label on unrevealed cards for non-spymasters */}
+                    {gameOver && !isSpymaster && !revealed && (
+                      <div style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        background: ROLE_BADGE[card.role]?.bg || "#333",
+                        color: ROLE_BADGE[card.role]?.color || "white",
+                        fontSize: "0.65rem",
+                        fontWeight: 800,
+                        textAlign: "center",
+                        padding: "0.18rem 0",
+                        letterSpacing: "0.05em",
+                        borderBottomLeftRadius: "inherit",
+                        borderBottomRightRadius: "inherit",
+                      }}>
+                        {ROLE_BADGE[card.role]?.label}
+                      </div>
+                    )}
                   </div>
                 );
               })}

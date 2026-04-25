@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useSocket } from "../SocketContext";
+import { SettingsButton } from "../MusicPlayer";
 import styles from "./LobbyScreen.module.css";
 
-export default function LobbyScreen({ onJoined }) {
+export default function LobbyScreen({ onJoined, music }) {
   const { socket } = useSocket();
   const [tab, setTab] = useState("create");
   const [name, setName] = useState("");
@@ -33,6 +34,11 @@ export default function LobbyScreen({ onJoined }) {
 
   return (
     <div className={styles.lobby}>
+      {/* Settings button top-right */}
+      <div style={{ position: "fixed", top: "1rem", right: "1rem", zIndex: 100 }}>
+        <SettingsButton music={music} />
+      </div>
+
       <div className={styles.title}>VISUAL CUE</div>
       <div className={styles.sub}>Guess the image</div>
 

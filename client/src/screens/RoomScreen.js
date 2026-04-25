@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSocket } from "../SocketContext";
+import { SettingsButton } from "../MusicPlayer";
 import styles from "./RoomScreen.module.css";
 
 // Order: Red Spy, Blue Spy (top row) | Red Op, Blue Op (bottom row)
@@ -10,7 +11,7 @@ const SEATS = [
   { team: "blue", role: "operative", label: "🔵 Blue Operative",  colorClass: "seatBlueOp"  },
 ];
 
-export default function RoomScreen({ code, playerId, roomState, onLeave }) {
+export default function RoomScreen({ code, playerId, roomState, onLeave, music }) {
   const { socket } = useSocket();
   const [room, setRoom] = useState(roomState || null);
   const [copied, setCopied] = useState(false);
@@ -32,7 +33,6 @@ export default function RoomScreen({ code, playerId, roomState, onLeave }) {
   const me = room.players.find(p => p.id === playerId);
   const isHost = room.host === playerId;
 
-  // Players per seat
   const inSeat = (team, role) => room.players.filter(p => p.team === team && p.role === role);
   const unassigned = room.players.filter(p => !p.team && p.role !== "spectator");
   const spectators = room.players.filter(p => p.role === "spectator");
@@ -96,11 +96,13 @@ export default function RoomScreen({ code, playerId, roomState, onLeave }) {
             </div>
             <button className={styles.copyBtn} onClick={copyCode}>{copied ? "✓ Copied" : "Copy"}</button>
           </div>
+          {/* Settings button */}
+          <SettingsButton music={music} />
           <button className={styles.leaveBtn} onClick={onLeave}>← Leave Room</button>
         </div>
       </div>
 
-      {/* 4-box seat grid: top row = spymasters, bottom row = operatives */}
+      {/* 4-box seat grid */}
       <div className={styles.seatGrid}>
         {SEATS.map(({ team, role, label, colorClass }) => {
           const key = `${team}_${role}`;
@@ -143,7 +145,7 @@ export default function RoomScreen({ code, playerId, roomState, onLeave }) {
 
       {seatError && <div className={styles.seatError}>⚠ {seatError}</div>}
 
-      {/* Unassigned + Spectators area */}
+      {/* Unassigned + Spectators */}
       <div className={styles.bottomRow}>
         <div className={styles.poolBox}>
           <div className={styles.poolLabel}>🪑 Unassigned</div>

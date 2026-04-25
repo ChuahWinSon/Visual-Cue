@@ -78,9 +78,13 @@ function createGame() {
 }
 function sanitizeGameForOperative(game) {
   if (!game) return null;
+  const gameOver = game.phase === "game_over";
   return {
     ...game,
-    images: game.images.map((img) => ({ ...img, role: img.revealed ? img.role : "hidden" })),
+    images: game.images.map((img) => ({
+      ...img,
+      role: (img.revealed || gameOver) ? img.role : "hidden",
+    })),
   };
 }
 function switchTurn(g) {

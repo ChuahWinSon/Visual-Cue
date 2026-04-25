@@ -3,6 +3,7 @@ import { SocketProvider, useSocket } from "./SocketContext";
 import LobbyScreen from "./screens/LobbyScreen";
 import RoomScreen from "./screens/RoomScreen";
 import GameScreen from "./screens/GameScreen";
+import { useMusicPlayer } from "./MusicPlayer";
 
 function Inner() {
   const { socket, connected } = useSocket();
@@ -12,6 +13,9 @@ function Inner() {
   const [playerName, setPlayerName] = useState("");
   const [gameState, setGameState] = useState(null);
   const [roomState, setRoomState] = useState(null);
+
+  // Initialize music player once at the top level so it persists across screens
+  const music = useMusicPlayer();
 
   useEffect(() => {
     const saved = sessionStorage.getItem("imagenames_session");
@@ -39,14 +43,12 @@ function Inner() {
     if (!socket) return;
     const onRoomUpdate = (data) => {
       setRoomState(data);
-      // Only force-transition to room if game ended for everyone (host ended game)
       if (!data.gameStarted) setScreen((prev) => (prev === "game" ? "room" : prev));
     };
     socket.on("room_update", onRoomUpdate);
     return () => socket.off("room_update", onRoomUpdate);
   }, [socket]);
 
-  // Personal "go to lobby" signal from server
   useEffect(() => {
     if (!socket) return;
     const onGoToLobby = () => {
@@ -83,17 +85,17 @@ function Inner() {
           padding: "0.4rem", fontSize: "0.8rem", fontWeight: 600,
         }}>⚠ Connecting to server…</div>
       )}
-      {screen === "lobby" && <LobbyScreen onJoined={handleJoined} />}
+      {screen === "lobby" && <LobbyScreen onJoined={handleJoined} music={music} />}
       {screen === "room" && (
         <RoomScreen
           code={roomCode} playerId={playerId} playerName={playerName}
-          roomState={roomState} onLeave={handleLeaveRoom}
+          roomState={roomState} onLeave={handleLeaveRoom} music={music}
         />
       )}
       {screen === "game" && (
         <GameScreen
           code={roomCode} playerId={playerId}
-          initialGame={gameState} initialRoom={roomState}
+          initialGame={gameState} initialRoom={roomState} music={music}
         />
       )}
     </div>
