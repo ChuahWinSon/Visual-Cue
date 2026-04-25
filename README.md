@@ -1,6 +1,6 @@
 # Visual Cue
 
-Real-time multiplayer visual version of Codenames where clues are images you find yourself.
+A multiplayer online game, visual adaptation of codenames where clues are images you find yourself.
 
 ---
 
@@ -94,7 +94,7 @@ npm start             # runs on :3000, auto-connects to :3001
 
 Open multiple tabs to test multiplayer locally.
 
-## 🔧 Customisation
+## Customisation
 
 **Add board images** — edit both `server/index.js` and `client/src/images.js`:
 ```js
