@@ -1,10 +1,10 @@
-# 🎮 Image Names — Visual Codenames
+# Visual Cue
 
-Real-time multiplayer image-based Codenames. Players create or join rooms, pick a seat (Red/Blue × Spymaster/Operative), and play a visual version of Codenames where clues are images you find yourself.
+Real-time multiplayer visual version of Codenames where clues are images you find yourself.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 imagenames/
@@ -28,7 +28,7 @@ imagenames/
 
 ---
 
-## 🚀 Deployment (Render + Vercel — both free)
+## Deployment (Render + Vercel)
 
 ### STEP 1 — Deploy Backend to Render
 
@@ -49,8 +49,6 @@ imagenames/
    ```
    https://imagenames-server.onrender.com
    ```
-
-> ⚠️ **Render free tier spins down after 15 min of inactivity.** First request after idle takes ~30s. Upgrade to a paid plan ($7/mo) to keep it always-on, or use a free uptime monitor like UptimeRobot to ping it every 10 min.
 
 ---
 
@@ -77,11 +75,10 @@ imagenames/
    ```
 3. Render redeploys automatically
 
-✅ **Done!** Share your Vercel URL and play.
 
 ---
 
-## 💻 Running Locally
+## Running Locally
 
 ```bash
 # Terminal 1 — backend
@@ -97,26 +94,6 @@ npm start             # runs on :3000, auto-connects to :3001
 
 Open multiple tabs to test multiplayer locally.
 
----
-
-## 🎮 How to Play
-
-| Role | What they do |
-|------|-------------|
-| **Spymaster** | Sees color key for all 25 board images. Gives clues by uploading/linking a custom image + a number |
-| **Operative** | Clicks board images they think match the spymaster's clue image |
-
-### Flow
-1. Board = 25 images (9 red, 8 blue, 7 neutral, 1 💀 assassin)
-2. Only spymasters see the color key
-3. Spymaster uploads a clue image (URL or file) + a number (1–9)
-4. Operatives click board images they think relate to the clue
-5. Correct → keep guessing. Wrong → turn ends. Assassin → instant loss
-6. First team to find all their images wins
-7. Win screen → everyone clicks "Return to Lobby" to play again
-
----
-
 ## 🔧 Customisation
 
 **Add board images** — edit both `server/index.js` and `client/src/images.js`:
@@ -124,4 +101,3 @@ Open multiple tabs to test multiplayer locally.
 { id: "img31", url: "https://...", label: "Label" }
 ```
 
-**Keep Render from sleeping** — add your Render URL to [UptimeRobot](https://uptimerobot.com) (free) with a 10-min ping interval.
