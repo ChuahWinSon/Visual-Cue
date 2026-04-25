@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: imagenames-server
+    env: node
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: FRONTEND_URL
+        value: https://your-vercel-app.vercel.app

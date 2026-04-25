@@ -1,0 +1,125 @@
+.page { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 3rem; min-height: 100vh; }
+.loading { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.loadingText { color: var(--text-dim); }
+
+.header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;
+}
+.title { font-family: 'Bebas Neue', cursive; font-size: 2rem; letter-spacing: 0.05em; color: var(--gold); }
+.subtitle { font-size: 0.8rem; color: var(--text-dim); }
+.headerRight { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+
+.codeBadge {
+  display: flex; align-items: center; gap: 0.75rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.65rem 1.1rem;
+}
+.codeLabel { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); }
+.codeValue { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; letter-spacing: 0.2em; color: var(--gold); }
+.copyBtn {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-dim); padding: 0.35rem 0.75rem; font-size: 0.75rem; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.copyBtn:hover { color: var(--gold); border-color: var(--gold); }
+
+.leaveBtn {
+  background: transparent; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-dim); padding: 0.35rem 0.75rem; font-size: 0.75rem; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+}
+.leaveBtn:hover { border-color: var(--red); color: var(--red); }
+
+/* ── 4-box grid: top=spymasters, bottom=operatives ── */
+.seatGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+@media (max-width: 540px) { .seatGrid { grid-template-columns: 1fr; } }
+
+.seatBox {
+  background: var(--surface); border: 2px solid var(--border); border-radius: 13px;
+  padding: 1.1rem; display: flex; flex-direction: column; gap: 0.65rem;
+  min-height: 130px; transition: border-color 0.2s;
+}
+.seatRedSpy  { border-top: 4px solid var(--red); }
+.seatBlueSpy { border-top: 4px solid var(--blue); }
+.seatRedOp   { border-top: 3px solid rgba(230,57,70,0.45); }
+.seatBlueOp  { border-top: 3px solid rgba(69,123,157,0.45); }
+.seatBoxMine { background: var(--surface2); }
+
+.seatLabel { font-family: 'Bebas Neue', cursive; font-size: 1.1rem; letter-spacing: 0.06em; }
+.seatRedSpy  .seatLabel { color: var(--red); }
+.seatBlueSpy .seatLabel { color: var(--blue); }
+.seatRedOp   .seatLabel { color: rgba(230,57,70,0.75); }
+.seatBlueOp  .seatLabel { color: rgba(69,123,157,0.8); }
+
+.seatPlayers { flex: 1; min-height: 22px; }
+.seatEmpty { font-size: 0.76rem; color: var(--text-dim); font-style: italic; }
+.seatPlayer {
+  font-size: 0.82rem; padding: 0.22rem 0.55rem; background: var(--surface3);
+  border-radius: 5px; font-weight: 500; display: inline-flex; align-items: center; gap: 0.4rem;
+}
+.pendingTag {
+  font-size: 0.6rem; padding: 1px 5px; background: rgba(244,162,97,0.2);
+  color: var(--gold); border-radius: 3px; text-transform: uppercase; letter-spacing: 0.07em;
+}
+
+.joinBtn {
+  padding: 0.45rem; border-radius: 7px; border: 1px solid var(--border);
+  background: transparent; font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.18s; color: var(--text-dim);
+}
+.joinBtn_seatRedSpy:hover  { background: rgba(230,57,70,0.15); border-color: var(--red); color: var(--red); }
+.joinBtn_seatBlueSpy:hover { background: rgba(69,123,157,0.15); border-color: var(--blue); color: var(--blue); }
+.joinBtn_seatRedOp:hover   { background: rgba(230,57,70,0.1); border-color: rgba(230,57,70,0.5); color: rgba(230,57,70,0.9); }
+.joinBtn_seatBlueOp:hover  { background: rgba(69,123,157,0.1); border-color: rgba(69,123,157,0.5); color: rgba(69,123,157,0.85); }
+.joinBtnFull { opacity: 0.45; cursor: not-allowed; }
+.leavesSeatBtn { background: rgba(244,162,97,0.1); border-color: rgba(244,162,97,0.4); color: var(--gold); }
+.leavesSeatBtn:hover { background: rgba(244,162,97,0.2); }
+
+.seatError {
+  background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.3);
+  color: var(--red); font-size: 0.8rem; border-radius: 7px;
+  padding: 0.5rem 0.85rem; margin-bottom: 0.85rem;
+}
+
+/* ── Bottom pools ── */
+.bottomRow { display: flex; gap: 0.85rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.poolBox {
+  flex: 1; min-width: 160px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.9rem; display: flex; flex-direction: column; gap: 0.5rem;
+}
+.poolLabel { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); font-weight: 600; }
+.poolPlayers { display: flex; flex-wrap: wrap; gap: 0.35rem; min-height: 24px; }
+.poolEmpty { font-size: 0.75rem; color: var(--text-dim); font-style: italic; }
+.poolChip {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.2rem 0.55rem; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 20px; font-size: 0.78rem;
+}
+.pendingChip { border-color: rgba(244,162,97,0.35); background: rgba(244,162,97,0.07); }
+.poolBtn {
+  margin-top: auto; padding: 0.35rem 0.6rem; background: transparent; border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text-dim); font-family: 'DM Sans', sans-serif;
+  font-size: 0.73rem; cursor: pointer; transition: all 0.2s;
+}
+.poolBtn:hover { border-color: var(--text-dim); color: var(--text); }
+
+.rules {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 0.9rem; font-size: 0.79rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 1.25rem;
+}
+.rules strong { color: var(--text); }
+.error { color: var(--red); font-size: 0.85rem; margin-bottom: 0.75rem; }
+.startBtn {
+  width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--red), #b02430);
+  border: none; border-radius: 10px; color: white; font-family: 'Bebas Neue', cursive;
+  font-size: 1.4rem; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; margin-bottom: 0.75rem;
+}
+.startBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(230,57,70,0.3); }
+.startBtn:disabled { opacity: 0.4; transform: none; box-shadow: none; cursor: not-allowed; }
+.hint { font-size: 0.8rem; color: var(--text-dim); text-align: center; }
