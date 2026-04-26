@@ -180,34 +180,34 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom, m
             <div className={styles.goEmoji}>{game.winner === "red" ? "🔴" : "🔵"}</div>
             <div className={`${styles.goTitle} ${styles[`win_${game.winner}`]}`}>{game.winner?.toUpperCase()} WINS!</div>
             <div className={styles.goReason}>{game.winReason}</div>
-            {/* Reveal legend for operatives */}
-            {!isSpymaster && (
-              <div style={{
-                background: "rgba(255,255,255,0.08)",
-                borderRadius: "8px",
-                padding: "0.6rem 0.8rem",
-                marginTop: "0.7rem",
-                marginBottom: "0.4rem",
-                fontSize: "0.78rem",
-                lineHeight: 1.6,
-                textAlign: "left",
-              }}>
-                <div style={{ fontWeight: 700, marginBottom: "0.3rem", opacity: 0.85 }}>🗺 Board Revealed</div>
-                {Object.entries(ROLE_BADGE).map(([role, { bg, label, color }]) => (
-                  <div key={role} style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.2rem" }}>
-                    <span style={{ background: bg, color: color || "white", borderRadius: "4px", padding: "0 0.35rem", fontSize: "0.72rem", fontWeight: 700 }}>{label}</span>
-                    <span style={{ opacity: 0.7 }}>= {role} card</span>
-                  </div>
-                ))}
-                <div style={{ marginTop: "0.4rem", opacity: 0.6 }}>Coloured borders show each card's team.</div>
-              </div>
-            )}
+
             <button className={styles.returnBtn} onClick={returnToLobby}>Return to Lobby</button>
             {room?.host === playerId && (
               <button className={styles.endAllBtn} onClick={endForAll}>End for Everyone</button>
             )}
             <div className={styles.pendingNote}>Only you will return. Others can keep viewing.</div>
           </div>
+        <hr className={styles.divider} />
+        <div className={styles.panelLabel}>Players</div>
+        <div>
+          {players.map(p => (
+            <div className={styles.playerRow} key={p.id}>
+              <span className={p.team === "red" ? styles.dotRed : p.team === "blue" ? styles.dotBlue : styles.dotGray}>●</span>
+              <span className={styles.pname}>{p.name}{p.id === playerId ? " ★" : ""}</span>
+              <span className={`${styles.ptag} ${p.role === "spymaster" ? styles.spy : p.role === "spectator" ? styles.spec : styles.op}`}>
+                {p.role || "—"}
+              </span>
+              {p.pendingLobby && <span className={styles.inGameDot} title="Still in game">🎮</span>}
+            </div>
+          ))}
+        </div>
+        <hr className={styles.divider} />
+        <div className={styles.panelLabel}>Game Log</div>
+        <div className={styles.log}>
+          {game.log.map((e, i) => (
+            <div key={i} className={`${styles.logEntry} ${styles[`log_${e.type}`]}`}>{e.text}</div>
+          ))}
+        </div>
         </div>
       );
     }
@@ -276,6 +276,27 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom, m
               ⚠️ {uploadError}
             </div>
           )}
+        <hr className={styles.divider} />
+        <div className={styles.panelLabel}>Players</div>
+        <div>
+          {players.map(p => (
+            <div className={styles.playerRow} key={p.id}>
+              <span className={p.team === "red" ? styles.dotRed : p.team === "blue" ? styles.dotBlue : styles.dotGray}>●</span>
+              <span className={styles.pname}>{p.name}{p.id === playerId ? " ★" : ""}</span>
+              <span className={`${styles.ptag} ${p.role === "spymaster" ? styles.spy : p.role === "spectator" ? styles.spec : styles.op}`}>
+                {p.role || "—"}
+              </span>
+              {p.pendingLobby && <span className={styles.inGameDot} title="Still in game">🎮</span>}
+            </div>
+          ))}
+        </div>
+        <hr className={styles.divider} />
+        <div className={styles.panelLabel}>Game Log</div>
+        <div className={styles.log}>
+          {game.log.map((e, i) => (
+            <div key={i} className={`${styles.logEntry} ${styles[`log_${e.type}`]}`}>{e.text}</div>
+          ))}
+        </div>
         </div>
       );
     }
@@ -305,6 +326,27 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom, m
             </button>
           )}
           {isSpectator && <div className={styles.spectatorNote}>👁 Spectating</div>}
+        <hr className={styles.divider} />
+        <div className={styles.panelLabel}>Players</div>
+        <div>
+          {players.map(p => (
+            <div className={styles.playerRow} key={p.id}>
+              <span className={p.team === "red" ? styles.dotRed : p.team === "blue" ? styles.dotBlue : styles.dotGray}>●</span>
+              <span className={styles.pname}>{p.name}{p.id === playerId ? " ★" : ""}</span>
+              <span className={`${styles.ptag} ${p.role === "spymaster" ? styles.spy : p.role === "spectator" ? styles.spec : styles.op}`}>
+                {p.role || "—"}
+              </span>
+              {p.pendingLobby && <span className={styles.inGameDot} title="Still in game">🎮</span>}
+            </div>
+          ))}
+        </div>
+        <hr className={styles.divider} />
+        <div className={styles.panelLabel}>Game Log</div>
+        <div className={styles.log}>
+          {game.log.map((e, i) => (
+            <div key={i} className={`${styles.logEntry} ${styles[`log_${e.type}`]}`}>{e.text}</div>
+          ))}
+        </div>
         </div>
       );
     }
@@ -323,6 +365,28 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom, m
             <img src={game.clue.imageUrl} alt="clue" className={styles.bigPreviewImg} />
           </div>
         )}
+
+        <hr className={styles.divider} />
+        <div className={styles.panelLabel}>Players</div>
+        <div>
+          {players.map(p => (
+            <div className={styles.playerRow} key={p.id}>
+              <span className={p.team === "red" ? styles.dotRed : p.team === "blue" ? styles.dotBlue : styles.dotGray}>●</span>
+              <span className={styles.pname}>{p.name}{p.id === playerId ? " ★" : ""}</span>
+              <span className={`${styles.ptag} ${p.role === "spymaster" ? styles.spy : p.role === "spectator" ? styles.spec : styles.op}`}>
+                {p.role || "—"}
+              </span>
+              {p.pendingLobby && <span className={styles.inGameDot} title="Still in game">🎮</span>}
+            </div>
+          ))}
+        </div>
+        <hr className={styles.divider} />
+        <div className={styles.panelLabel}>Game Log</div>
+        <div className={styles.log}>
+          {game.log.map((e, i) => (
+            <div key={i} className={`${styles.logEntry} ${styles[`log_${e.type}`]}`}>{e.text}</div>
+          ))}
+        </div>
       </div>
     );
   };
@@ -436,28 +500,6 @@ export default function GameScreen({ code, playerId, initialGame, initialRoom, m
           </div>
         </div>
 
-        {/* Right panel */}
-        <div className={styles.rightPanel}>
-          <div className={styles.panelSection}>
-            <div className={styles.panelLabel}>Players</div>
-            {players.map(p => (
-              <div className={styles.playerRow} key={p.id}>
-                <span className={p.team === "red" ? styles.dotRed : p.team === "blue" ? styles.dotBlue : styles.dotGray}>●</span>
-                <span className={styles.pname}>{p.name}{p.id === playerId ? " ★" : ""}</span>
-                <span className={`${styles.ptag} ${p.role === "spymaster" ? styles.spy : p.role === "spectator" ? styles.spec : styles.op}`}>
-                  {p.role || "—"}
-                </span>
-                {p.pendingLobby && <span className={styles.inGameDot} title="Still in game">🎮</span>}
-              </div>
-            ))}
-          </div>
-          <div className={styles.log}>
-            <div className={styles.panelLabel}>Game Log</div>
-            {game.log.map((e, i) => (
-              <div key={i} className={`${styles.logEntry} ${styles[`log_${e.type}`]}`}>{e.text}</div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
