@@ -385,6 +385,12 @@ io.on("connection", (socket) => {
     emitRoomUpdate(roomCode);
   });
 
+  socket.on("play_sound", ({ file }) => {
+    const { roomCode } = socket.data;
+    if (!roomCode || !rooms[roomCode]) return;
+    io.to(roomCode).emit("play_sound", { file });
+  });
+
   socket.on("leave_room", () => {
     const { roomCode, playerId } = socket.data;
     const room = rooms[roomCode];

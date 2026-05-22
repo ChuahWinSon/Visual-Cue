@@ -4,6 +4,7 @@ import LobbyScreen from "./screens/LobbyScreen";
 import RoomScreen from "./screens/RoomScreen";
 import GameScreen from "./screens/GameScreen";
 import { useMusicPlayer } from "./MusicPlayer";
+import Soundboard, { SoundboardListener, useSoundboard } from "./Soundboard";
 
 function Inner() {
   const { socket, connected } = useSocket();
@@ -16,6 +17,7 @@ function Inner() {
 
   // Initialize music player once at the top level so it persists across screens
   const music = useMusicPlayer();
+  const isMaster = useSoundboard(playerName);
 
   useEffect(() => {
     const saved = sessionStorage.getItem("imagenames_session");
@@ -78,6 +80,8 @@ function Inner() {
 
   return (
     <div>
+      <SoundboardListener />
+      {isMaster && <Soundboard />}
       {!connected && (
         <div style={{
           position: "fixed", top: 0, left: 0, right: 0, zIndex: 9999,
